@@ -1,7 +1,9 @@
 #ifndef DOUBLYGENERICLIST_H
 #define DOUBLYGENERICLIST_H
 
-#include <genode.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "genode.h"
 
 typedef struct DoublyGenericList
 {
@@ -13,7 +15,7 @@ typedef struct DoublyGenericList
 
     //Last Removed
 
-}DoublyGenericList;
+} DoublyGenericList;
 
 //(^< ............ ............ ............
 DoublyGenericList *new_DoublyGenericList(){
@@ -21,8 +23,9 @@ DoublyGenericList *new_DoublyGenericList(){
     DoublyGenericList *TmpGeList = (DoublyGenericList *)malloc(sizeof(DoublyGenericList));
 
     TmpGeList->Length = 0;
-    TmpGeList->First = NULL;
-    TmpGeList->Last = NULL;
+    TmpGeList->First = 0;
+    TmpGeList->Last = 0;
+    TmpGeList->Length = 0;
 
     return TmpGeList;
 }
@@ -93,17 +96,6 @@ void EndInsert(DoublyGenericList *TmpGeList,void *newData){
 }
 
 //(^< ............ ............ ............ g e t   N O D E   b y   I N D E X
-GeNode *getNodebyIndex(DoublyGenericList *TmpGeList,int index){
-    if(isValidIndex(TmpGeList->Length,index)){
-        return getNodebyIndext_Recusively(TmpGeList->First,index);
-
-    }
-    else{
-        return NULL;
-    }
-}
-
-//(^< ............ ............ ............ g e t   N O D E   b y   I N D E X
 GeNode *getNodebyIndext_Recusively(GeNode *TmpNode ,int index){
 
     if(index == 0){
@@ -112,10 +104,205 @@ GeNode *getNodebyIndext_Recusively(GeNode *TmpNode ,int index){
     else{
         TmpNode = TmpNode->Next;
         index--;
-        return getNodebyIndex(TmpNode,index);
+        return getNodebyIndext_Recusively(TmpNode,index);
     }
-
 }
+
+//(^< ............ ............ ............ g e t   N O D E   b y   I N D E X
+GeNode *getNodebyIndex(DoublyGenericList *TmpGeList,int index){
+    if(isValidIndex(TmpGeList->Length,index)){
+        return getNodebyIndext_Recusively(TmpGeList->First,index);
+    }
+    else{
+        return 0;
+    }
+}
+
+//(^< ............ ............ ............ S P E C I F I C   I N S E R T
+int SpecificInsert(DoublyGenericList *TmpGeList,void *newData,int index){
+    if(isValidIndex(TmpGeList->Length,index)){
+        //(^< ............ FrontInsert
+        if(TmpGeList->Length == 0){
+            FrontInsert(TmpGeList,newData);
+            return 1;
+        }
+        //(^< ............ IntermediateInsert
+        else{
+            
+            GeNode *OldNode = getNodebyIndex(TmpGeList,index);
+            GeNode *NewNode = new_GeNode(newData);
+            
+            OldNode->Previous->Next = NewNode;
+            NewNode->Previous = OldNode->Previous;
+            
+            OldNode->Previous = NewNode;
+            NewNode->Next = OldNode;
+            
+            TmpGeList->Length++;
+            
+            return 1;
+        }
+    }
+    else{
+        //(^< ............ EndInsert
+        if(TmpGeList->Length == index){
+            EndInsert(TmpGeList,newData);
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+}
+
+//(^< ............ ............ ............ F R O N T   R E M O V E
+GeNode *FrontRemove(DoublyGenericList *TmpGeList){
+    
+    if(!isEmpty(TmpGeList->Length)){
+        GeNode *TmpNode = TmpGeList->First;
+        
+        TmpGeList->First = 0;
+        TmpGeList->Last = 0;
+        
+        TmpGeList->Length--;
+        
+        return TmpNode;
+    }
+    
+    if(!isEmpty(TmpGeList->Length)){
+        
+        GeNode *TmpNode = TmpGeList->First;
+     
+        TmpGeList->First = TmpGeList->First->Next;
+        TmpGeList->First->Previous = 0;
+        
+        TmpNode->Next = 0;
+        TmpNode->Previous = 0;
+        
+        //freeGeNode(&TmpNode);
+        TmpGeList->Length--;
+        
+        return TmpNode;
+    }
+    else{
+        return 0;
+    }
+}
+
+//(^< ............ ............ ............ E N D   R E M O V E
+GeNode *EndRemove(DoublyGenericList *TmpGeList){
+    
+    if(!isEmpty(TmpGeList->Length)){
+        GeNode *TmpNode = TmpGeList->Last;
+        
+        TmpGeList->First = 0;
+        TmpGeList->Last = 0;
+        
+        TmpGeList->Length--;
+        
+        return TmpNode;
+    }
+    
+    if(!isEmpty(TmpGeList->Length)){
+        
+        GeNode *TmpNode = TmpGeList->Last;
+        
+        TmpGeList->Last = TmpGeList->Last->Previous;
+        TmpGeList->Last->Next = 0;
+        
+        TmpNode->Next = 0;
+        TmpNode->Previous = 0;
+        
+        //freeGeNode(&TmpNode);
+        TmpGeList->Length--;
+        
+        return TmpNode;
+    }
+    else{
+        return 0;
+    }
+}
+
+//(^< ............ ............ ............ S P E C I F I C   R E M O V E
+int SpecificRemove(DoublyGenericList *TmpGeList,int index){
+    if(isValidIndex(TmpGeList->Length,index)){
+        
+        //(^< ............ FrontRemove
+        if(TmpGeList->Length == 0){
+            FrontRemove(TmpGeList);
+            return 1;
+        }
+        //(^< ............ IntermediateRemove
+        else{
+            
+            GeNode *OldNode = getNodebyIndex(TmpGeList,index);
+            
+            OldNode->Previous->Next = OldNode->Next;
+            OldNode->Next->Previous = OldNode->Previous;
+            
+            OldNode->Previous = 0;
+            OldNode->Next = 0;
+            
+            freeGeNode(&OldNode);
+            TmpGeList->Length--;
+            
+            return 1;
+        }
+    }
+    else{
+        //(^< ............ EndRemove
+        if(TmpGeList->Length == index){
+            EndRemove(TmpGeList);
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+}
+
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+//(^< ............ ............ ............ ............ ............ S T A C K
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+
+void Push(DoublyGenericList *TmpGeList,void *newData){
+    FrontInsert(TmpGeList,newData);
+}
+
+GeNode *Pop(DoublyGenericList *TmpGeList){
+    return FrontRemove(TmpGeList);
+}
+
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+//(^< ............ ............ ............ ............ ............ Q U E U E
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+
+void EnQueue(DoublyGenericList *TmpGeList,void *newData){
+    EndInsert(TmpGeList,newData);
+}
+
+GeNode *DeQueue(DoublyGenericList *TmpGeList){
+    return FrontRemove(TmpGeList);
+}
+
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+//(^< ............ ............ ............ ............ ............ P R I N T
+//(^< ............ ............ ............ ............ ............ ............ ............ ............ ............ ............
+
+void PrintGeneric(DoublyGenericList *TmpGeList, void (*GenFunc)(void *GenericData))
+{
+    if(!isEmpty(TmpGeList->Length)){
+        
+        GeNode *Current = TmpGeList->First;
+    
+        while(Current != 0){
+            GenFunc(Current->Dt);
+            Current = Current->Next;
+        }
+    }
+}
+
+
 
 
 #endif // DOUBLYGENERICLIST_H
