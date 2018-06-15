@@ -1,7 +1,28 @@
 #include <stdio.h>
-#include "doublelist.h"
+#include <stdlib.h>
 
-int main()
+#include "doublygenericlist.h"
+
+typedef struct Info
+{
+    int ID;
+    char const* Name;
+}Info;
+
+//(^< ............ ............ ............ ............ ............ P R I N T   S P E C I F I C
+void PrintSpecific(void *Dt)
+{
+    Info *inf = (Info*) Dt;
+    
+    printf( "\n" );
+    printf( "\n\t--------------------------" );
+    printf( "\n\tID:\t%d", inf->ID );
+    printf( "\n\tName:\t%s", inf->Name );
+    printf( "\n\t--------------------------" );
+    printf( "\n" );
+}
+
+int main(int argc, char const *argv[])
 {
     
     DoublyGenericList *DList = new_DoublyGenericList();
@@ -25,64 +46,26 @@ int main()
     Info *Inf_4 = (Info*) malloc(sizeof(Info));
     Inf_4->ID = 10;
     Inf_4->Name = "Raul";
+    //(^< ............ ............ ............ ............ ............ P R I N T   S P E C I F I C
 
-    FrontInsert(DList,Inf_0);
-    FrontInsert(DList,Inf_1);
-    FrontInsert(DList,Inf_2);
-    FrontInsert(DList,Inf_3);
-    FrontInsert(DList,Inf_4);
-
-    GeNode *TmpNode = getNodebyIndex(DList,0);
-    int k = 0;
+    EndInsert(DList,Inf_0);
+    EndInsert(DList,Inf_1);
+    EndInsert(DList,Inf_2);
+    EndInsert(DList,Inf_3);
+    EndInsert(DList,Inf_4);
     
+    PrintGeneric(DList,PrintSpecific);
     
     /*
-    DoubleList * ML = NewDoubleList();
-    Student * Perito = NewStudent();
+    GeNode *TmpNode = FrontRemove(DList);
 
-    Perito->Age = 10;
-    Perito->FirstName = "Armando";
-    Perito->LastName  = "Sonora";
-
-    Student * Perito2 = NewStudent();
-
-    Perito2->Age = 15;
-    Perito2->FirstName = "Walter";
-    Perito2->LastName  = "Morales";
-
-    Student * Perito3 = NewStudent();
-
-    Perito3->Age = 20;
-    Perito3->FirstName = "Samuel";
-    Perito3->LastName  = "Villate";
-
-    Student * To = NewStudent();
-
-    Perito3->Age = 20;
-    Perito3->FirstName = "Samuel";
-    Perito3->LastName  = "Villate";
-
-    Student * Sal = NewStudent();
-
-    Perito3->Age = 20;
-    Perito3->FirstName = "Samuel";
-    Perito3->LastName  = "Villate";
-
-    add_to_ending(ML,Perito);
-    add_to_ending(ML,Perito2);
-    add_to_ending(ML,Perito3);
-
-    //aqui ya inserte armando,walter,samuel
-      //      y me tiene que dar samuel
-    //prova vs donde esta ese metodo?
-
-    DoubleNode * Holis = get_specific_node(ML,3);
-//Te Juro por mi gato que estava malo!!! ahahahaha
-    //mira ahora...dale clean
-
-    add_at_specific_index(Holis,To,1);
-
-    printf("Hello World!\n");
-    return 0;
+    Info *res = (Info *)TmpNode->Dt;
+    printf( "\nID: %d", res->ID);
+    printf( "\nName: %s",res->Name);
     */
+    
+    printf( "\n");
+    printf( "\n");
+    
+    return 0;
 }
